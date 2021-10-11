@@ -97,12 +97,18 @@ public class ConnectFour extends Application {
                 e.printStackTrace();
             }
         });
+        item3.setOnAction((ActionEvent t) -> {
+            handlePrintRules(primaryStage);
+        });
         item4.setOnAction((ActionEvent t) -> {
             clearBoard();
             handleAddPlayers(primaryStage);
         });
         item5.setOnAction((ActionEvent t) -> {
             handleGameExit(primaryStage);
+        });
+        item6.setOnAction((ActionEvent t) -> {
+            handlePrintRules(primaryStage);
         });
         //Setting the menubar into a group to post across the top of the tool.
         Group menuGroup = new Group(menuBar);
@@ -137,10 +143,10 @@ public class ConnectFour extends Application {
         }
     }
 
-    // Needs to be put into Dialog Box.
+    // Final statistics not in dialog box.
     private void printStatistics() {
         System.out.println("Name\tGames\tWins\tLosses\tTies");
-        String gLab = "";
+        String gLab = "Name\tGames\tWins\tLosses\tTies\n";
         for (int i = 0 ; i < 2 ; i++) {
             gLab += players[i].name + " " + players[i].games + " " + players[i].wins + " " +
                     players[i].losses + " " + players[i].ties + " ";
@@ -148,6 +154,40 @@ public class ConnectFour extends Application {
                     players[i].losses + "\t" + players[i].ties);
         }
         gameStats.setText(gLab);
+    }
+
+    private void handlePrintRules(Stage mainStage) {
+        System.out.println("Connect 4 Rules");
+        Alert dialog = new Alert(Alert.AlertType.NONE);
+        dialog.initOwner(mainStage);
+        dialog.setTitle("Connect 4 Rules");
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+
+        // Set up Text Area
+        String output = "Rules for Connect Four\n" +
+                "Decide who the two players are.\n" +
+                "Enter the name of each player\n" +
+                "The first player always goes first\n" +
+                "Each player drops their checker into a column\n" +
+                "The checker falls to the base of the chosen column\n" +
+                "The first player with four checkers in a row wins\n" +
+                "the row can be vertical, horizontal, or diagonal.";
+        TextArea area = new TextArea(output);
+        area.setPrefColumnCount(35);
+        area.setPrefRowCount(8);
+        ButtonType okButton = new ButtonType("OK");
+        gridPane.getChildren().add(area);
+        dialog.getDialogPane().setContent(gridPane);
+        dialog.getButtonTypes().addAll(okButton);
+        //dialog.show();
+
+        // Now take care of the buttons
+        Optional<ButtonType> result = dialog.showAndWait();
+        if (result.get() == okButton) {
+            dialog.close();
+        }
     }
 
     //Handle exiting the program and writing new statistics to file.
@@ -191,7 +231,7 @@ public class ConnectFour extends Application {
         gridPane.setVgap(10);
 
         // Set up Text Area
-        String output = "Name\tGames\tWins\t Losses\tTies\n";
+        String output = "Name\tGames\tWins\tLosses\tTies\n";
         if (fileIn.exists()) {
             input = new Scanner(fileIn);
             String inLine;
