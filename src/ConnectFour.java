@@ -6,6 +6,8 @@
  *      Cleaned up code to better explain how to use files for storing user information.
  * Modified 10 December 2020
  *      Force this to be the copy saved on the cloud.
+ * Modified 11 October 2021
+ *      Added Rules print section.
  */
 
 import java.io.*;                               // Import needed classes for writing to a file
@@ -175,7 +177,7 @@ public class ConnectFour extends Application {
                 "The first player with four checkers in a row wins\n" +
                 "the row can be vertical, horizontal, or diagonal.";
         TextArea area = new TextArea(output);
-        area.setPrefColumnCount(35);
+        area.setPrefColumnCount(30);
         area.setPrefRowCount(8);
         ButtonType okButton = new ButtonType("OK");
         gridPane.getChildren().add(area);
