@@ -24,6 +24,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
@@ -51,18 +52,21 @@ public class ConnectFour extends Application {
     private PrintWriter output;
     private Scanner input;
 
+    // Colors for ellipses
+    private Paint paint;
+
     // Create the application.
     @Override
     // overrides the start method that is in the Application class
     public void start(Stage primaryStage) throws IOException {
-        GridPane pane = new GridPane();                                    // creating new pane to hold each cell
+        GridPane pane = new GridPane();                                 // creating new pane to hold each cell
         for (int i = 0; i < 6; i++)
             for (int j = 0; j < 7; j++)
-                pane.add(cell[i][j] = new Cell(i, j), j, i);                // adding each cell to the GridPane
+                pane.add(cell[i][j] = new Cell(i, j), j, i);            // adding each cell to the GridPane
         BorderPane borderPane = new BorderPane();                                                                           // creating a BorderPane which will hold the "player" label
         borderPane.setCenter(pane);                                                                                         // setting the BorderPane to be in the center of the GridPane
         VBox bottomLabels = new VBox();
-        bottomLabels.getChildren().addAll(playerStats,gameStats);
+        bottomLabels.getChildren().addAll(playerStats, gameStats);
         borderPane.setBottom(bottomLabels);                                                                                       // setting the "player" label to be at the bottom of the screen
         //Creating file menu
         Menu file = new Menu("File");
@@ -116,9 +120,9 @@ public class ConnectFour extends Application {
         Group menuGroup = new Group(menuBar);
         borderPane.setTop(menuGroup);
         // Setting up the Scene and Stage to display both.
-        Scene scene = new Scene(borderPane, 640, 640);                                                        // creating scene and adding BorderPane to it
-        primaryStage.setTitle("Connect Four");                                                                                 // setting the stage title to "TicTacToe"
-        primaryStage.setScene(scene);                                                                                       // placing the scene in the stage
+        Scene scene = new Scene(borderPane, 640, 640);    // creating scene and adding BorderPane to it
+        primaryStage.setTitle("Connect Four");                 // setting the stage title to "TicTacToe"
+        primaryStage.setScene(scene);                          // placing the scene in the stage
         primaryStage.show();
         handleAddPlayers(primaryStage);
     }
@@ -149,7 +153,7 @@ public class ConnectFour extends Application {
     private void printStatistics() {
         System.out.println("Name\tGames\tWins\tLosses\tTies");
         String gLab = "Name\tGames\tWins\tLosses\tTies\n";
-        for (int i = 0 ; i < 2 ; i++) {
+        for (int i = 0; i < 2; i++) {
             gLab += players[i].name + " " + players[i].games + " " + players[i].wins + " " +
                     players[i].losses + " " + players[i].ties + " ";
             System.out.println(players[i].name + "\t" + players[i].games + "\t" + players[i].wins + "\t" +
@@ -168,7 +172,8 @@ public class ConnectFour extends Application {
         gridPane.setVgap(10);
 
         // Set up Text Area
-        String output = "Rules for Connect Four\n" +
+        String output =
+                "Rules for Connect Four\n" +
                 "Decide who the two players are.\n" +
                 "Enter the name of each player\n" +
                 "The first player always goes first\n" +
@@ -212,9 +217,9 @@ public class ConnectFour extends Application {
             output.println(input.nextLine());           // Copy lines to main file
         }
         //printStatistics();
-        for (int i = 0 ; i < 2 ; i++) {                 // Now load the two players stats
+        for (int i = 0; i < 2; i++) {                 // Now load the two players stats
             output.println(players[i].name + ',' + players[i].games + ',' + players[i].wins
-                    + ',' + players[i].losses  + ',' + players[i].ties);
+                    + ',' + players[i].losses + ',' + players[i].ties);
         }
         input.close();
         output.close();
@@ -233,7 +238,7 @@ public class ConnectFour extends Application {
         gridPane.setVgap(10);
 
         // Set up Text Area
-        String output = "Name\tGames\tWins\tLosses\tTies\n";
+        String output = "Name\tGames\tWins \tLosses\tTies\n";
         if (fileIn.exists()) {
             input = new Scanner(fileIn);
             String inLine;
@@ -247,7 +252,7 @@ public class ConnectFour extends Application {
                 int ties = Integer.parseInt(splitList.get(4));
                 int len = name.length();
                 // Statistics are read from the file above, make sure current statistics are shown.
-                for (int i = 0 ; i < 2 ; i++) {
+                for (int i = 0; i < 2; i++) {
                     if (name.equals(players[i].name)) {
                         games = players[i].games;
                         wins = players[i].wins;
@@ -255,7 +260,8 @@ public class ConnectFour extends Application {
                         ties = players[i].ties;
                     }
                 }
-                output += name + (len < 5 ? "\t\t" : "\t") + games + "\t\t" + wins + "\t\t"
+                output += name + (len < 5 ? "\t\t\t" : len < 9 ? "\t\t" :
+                        "\t") + games + "\t\t" + wins + "\t\t"
                         + losses + "\t\t" + ties + "\n";
             }
             input.close();
@@ -304,7 +310,7 @@ public class ConnectFour extends Application {
         // Define Buttons
         ButtonType okButton = new ButtonType("OK");
         ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialog.getButtonTypes().addAll(okButton,cancelButton);
+        dialog.getButtonTypes().addAll(okButton, cancelButton);
         vbox.getChildren().addAll(hBoxA, hBoxB);
         gridPane.add(vbox, 0, 0);
         dialog.getDialogPane().setContent(gridPane);
@@ -324,11 +330,11 @@ public class ConnectFour extends Application {
                 try {
                     initPlayers();
                 } catch (Exception e) {
+                    System.out.println("Cannot initialize players");
                 }
             }
             dialog.close();
-        }
-        else if(result.get() == cancelButton) {
+        } else if (result.get() == cancelButton) {
             dialog.close();
         }
     }
@@ -365,8 +371,8 @@ public class ConnectFour extends Application {
                         notFound = false;
                     }
                 }
-                if(notFound)  output.println(inLine);
-             }
+                if (notFound) output.println(inLine);
+            }
             output.close();
             input.close();
         }
@@ -386,6 +392,7 @@ public class ConnectFour extends Application {
 
     public boolean isWon(char token) {
         Background background;
+        if (token == ' ') return false;             // No winners if checking empty item.
         if (token == 'R') background = new Background(new BackgroundFill(Color.ORCHID, null, null));
         else background = new Background(new BackgroundFill(Color.LIGHTCORAL, null, null));
         // Now Start the tests.
@@ -472,7 +479,7 @@ public class ConnectFour extends Application {
         Background background = new Background(new BackgroundFill(Color.WHEAT, null, null));
         for (int i = 5; i >= 0; i--) {
             for (int j = 6; j >= 0; j--) {
-                cell[i][j].setToken(' ');
+                cell[i][j].setToken(' ', false);
                 cell[i][j].setBackground(background);
             }
         }
@@ -510,57 +517,39 @@ public class ConnectFour extends Application {
             this.setOnMouseClicked(e -> handleMouseClick());                                                                // handling what happens to the cell when the mouse is clicked
         }
 
-        // Set ellipse RED
-        Task<Void> longRunningTask = new Task<Void>() {
-
-            @Override
-            protected Void call() throws Exception {
-                Platform.runLater(() -> ellipse.setFill(Color.RED));
-                return null;
-            }
-        };
-
-
         public char getToken() {
             return token;                                                                        // returning "token"
         }
 
 
-        public void setToken(char c) {
+        public void setToken(char c, boolean callBack) {
             token = c;                                                                           // setting a new "token"
-            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(1));
+            PauseTransition pauseTransition = new PauseTransition(Duration.millis(400));
             long start;
             // Go through the process of dropping the checker
             if (token == ' ') {
-                pauseTransition.setOnFinished(event -> ellipse.setFill(Color.TRANSPARENT));
-                pauseTransition.play();
+                paint = Color.TRANSPARENT;
             } else if (token == 'R') {                                                             // creating an "X"
-                pauseTransition.setOnFinished(event -> ellipse.setFill(Color.RED));
-                pauseTransition.play();
-                //new Thread(longRunningTask).start();
-                if ((xVal < 5) && (cell[xVal + 1][yVal].getToken() == ' ')) {
-                    start = System.currentTimeMillis() + 1000;
-                    while (System.currentTimeMillis() < start) ;
-                    cell[xVal + 1][yVal].setToken(token);
-                    this.setToken(' ');
-                }
+                paint = Color.RED;
             } else if (token == 'B') {
-                pauseTransition.setOnFinished(event -> ellipse.setFill(Color.YELLOW));
-                pauseTransition.play();
-                if ((xVal < 5) && (cell[xVal + 1][yVal].getToken() == ' ')) {
-                    //java.lang.Object.wait(1000);
-                    start = System.currentTimeMillis() + 1000;
-                    while (System.currentTimeMillis() < start) ;
-                    cell[xVal + 1][yVal].setToken(token);
-                    this.setToken(' ');
-                }
+                paint = Color.YELLOW;
             }
+            ellipse.setFill(paint);
+            if (callBack) cell[xVal - 1][yVal].setToken(' ', false);
+            if ((xVal < 5) && (cell[xVal + 1][yVal].getToken() == ' ')) {
+                // start = System.currentTimeMillis() + 500;
+                //while (System.currentTimeMillis() < start) ;
+                if (token != ' ') {
+                    pauseTransition.setOnFinished(event -> cell[xVal + 1][yVal].setToken(token, true));
+                    pauseTransition.play();
+                }
+            } else isWon(token);
         }
 
 
         private void handleMouseClick() {                                                                                   // creating the method to handle what happens when the mouse gets clicked
             if (token == ' ' && whoseTurn != ' ') {                                                                         // if the cell is empty and game is not over,
-                setToken(whoseTurn);                                                                                        // set the desired token into the cell that was clicked
+                setToken(whoseTurn, false);                                                                                        // set the desired token into the cell that was clicked
                 if (isWon(whoseTurn)) {                                                                                     // checking the game status using the "isWon" method
                     playerStats.setText((whoseTurn == 'R' ? players[0].name : players[1].name) +
                             " won the game! Congratulations");                  // if game is won, displays message saying "Congratulations"
@@ -596,7 +585,7 @@ public class ConnectFour extends Application {
                     playerStats.setText((whoseTurn == 'R' ? players[0].name : players[1].name)
                             + " Player's turn");                                                      // displays whose turn it is
                 }
-                printStatistics();
+                //printStatistics();
             }
         }
 
