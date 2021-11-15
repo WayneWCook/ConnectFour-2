@@ -19,7 +19,6 @@ import java.util.Scanner;                       // Import needed classes for rea
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.scene.Group;
 import javafx.scene.control.*;
@@ -36,9 +35,10 @@ import static javafx.scene.paint.Color.BLACK;
 
 public class ConnectFour extends Application {
     private char whoseTurn = 'R';                                                                                           // indicates whose turn it is
-
+    private char firstTurn = whoseTurn;
+    private int winner = -1;
     private Cell[][] cell = new Cell[6][7];                                                                                // creates an 2x2 array for the board
-
+    private Ellipse playerEllipse = new Ellipse(5,5);
     private Label playerStats = new Label("Player's turn Here");                                                             // creates a player label at the bottom of the screen which says whose turn it is
     private Label gameStats = new Label("Game Stats Here");
     private String fileBase = "connectFour",
@@ -66,7 +66,14 @@ public class ConnectFour extends Application {
         BorderPane borderPane = new BorderPane();                                                                           // creating a BorderPane which will hold the "player" label
         borderPane.setCenter(pane);                                                                                         // setting the BorderPane to be in the center of the GridPane
         VBox bottomLabels = new VBox();
-        bottomLabels.getChildren().addAll(playerStats, gameStats);
+        HBox playerStatsArea = new HBox();
+        playerEllipse.setStrokeWidth(1);                                                                                  // setting the width of the "O" to "5"
+        playerEllipse.setStroke(BLACK);
+        playerEllipse.setFill(Color.TRANSPARENT);
+        playerStatsArea.setSpacing(5);
+        bottomLabels.setSpacing(2);
+        playerStatsArea.getChildren().addAll(playerEllipse,playerStats);
+        bottomLabels.getChildren().addAll(playerStatsArea, gameStats);
         borderPane.setBottom(bottomLabels);                                                                                       // setting the "player" label to be at the bottom of the screen
         //Creating file menu
         Menu file = new Menu("File");
@@ -149,14 +156,14 @@ public class ConnectFour extends Application {
         }
     }
 
-    // Final statistics not in dialog box.
+    // Final statistics not in bottom box.
     private void printStatistics() {
         System.out.println("Name\tGames\tWins\tLosses\tTies");
-        String gLab = "Name\tGames\tWins\tLosses\tTies\n";
+        String gLab = "Name\tGames\tWins\t\tLosses\tTies\n";
         for (int i = 0; i < 2; i++) {
             gLab += players[i].name + " " + players[i].games + " " + players[i].wins + " " +
                     players[i].losses + " " + players[i].ties + " ";
-            System.out.println(players[i].name + "\t" + players[i].games + "\t" + players[i].wins + "\t" +
+            System.out.println(players[i].name + "\t" + players[i].games + "\t" + players[i].wins + "\t\t" +
                     players[i].losses + "\t" + players[i].ties);
         }
         gameStats.setText(gLab);
@@ -300,18 +307,53 @@ public class ConnectFour extends Application {
         HBox hBoxA = new HBox();
         hBoxA.setSpacing(10);
         hBoxA.getChildren().addAll(labelA, playerA);
+        HBox radioA = new HBox();
+        radioA.setSpacing(10);
+        RadioButton colorA1 = new RadioButton("Red");
+        colorA1.setUserData("Red");
+        RadioButton colorA2 = new RadioButton("Blue");
+        colorA2.setUserData("Blue");
+        RadioButton colorA3 = new RadioButton("Green");
+        colorA3.setUserData("Green");
+        RadioButton colorA4 = new RadioButton("Purple");
+        colorA4.setUserData("Purple");
+        ToggleGroup groupA = new ToggleGroup();
+        colorA1.setToggleGroup(groupA);
+        colorA2.setToggleGroup(groupA);
+        colorA3.setToggleGroup(groupA);
+        colorA4.setToggleGroup(groupA);
+        colorA1.setSelected(true);
+        colorA1.requestFocus();
+        radioA.getChildren().addAll(colorA1,colorA2,colorA3, colorA4);
         Label labelB = new Label("Player B: ");
         TextField playerB = new TextField();
         playerB.setPromptText("Second Player");
         HBox hBoxB = new HBox();
         hBoxB.setSpacing(10);
         hBoxB.getChildren().addAll(labelB, playerB);
-        HBox hBoxButton = new HBox();
+        HBox radioB = new HBox();
+        radioB.setSpacing(10);
+        RadioButton colorB1 = new RadioButton("Yellow");
+        colorB1.setUserData("Yellow");
+        RadioButton colorB2 = new RadioButton("Violet");
+        colorB2.setUserData("Violet");
+        RadioButton colorB3 = new RadioButton("Orange");
+        colorB3.setUserData("Orange");
+        RadioButton colorB4 = new RadioButton("Coral");
+        colorB4.setUserData("Coral");
+        ToggleGroup groupB = new ToggleGroup();
+        colorB1.setToggleGroup(groupB);
+        colorB2.setToggleGroup(groupB);
+        colorB3.setToggleGroup(groupB);
+        colorB4.setToggleGroup(groupB);
+        colorB1.setSelected(true);
+        colorB1.requestFocus();
+        radioB.getChildren().addAll(colorB1,colorB2,colorB3, colorB4);
         // Define Buttons
         ButtonType okButton = new ButtonType("OK");
         ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
         dialog.getButtonTypes().addAll(okButton, cancelButton);
-        vbox.getChildren().addAll(hBoxA, hBoxB);
+        vbox.getChildren().addAll(hBoxA, radioA, hBoxB, radioB);
         gridPane.add(vbox, 0, 0);
         dialog.getDialogPane().setContent(gridPane);
         Platform.runLater(() -> playerA.requestFocus());
@@ -333,16 +375,32 @@ public class ConnectFour extends Application {
                     System.out.println("Cannot initialize players");
                 }
             }
+            // Load Paint colors
+            String paintChoiceA = groupA.getSelectedToggle().getUserData().toString();
+            System.out.println("Color Choice for Player A is " + paintChoiceA);
+            players[0].paint = Color.RED;                           // Set the default color
+            if (paintChoiceA.equals("Blue")) players[0].paint = Color.BLUE;
+            else if (paintChoiceA.equals("Green")) players[0].paint = Color.GREEN;
+            else if (paintChoiceA.equals("Purple")) players[0].paint = Color.PURPLE;
+            String paintChoiceB = groupB.getSelectedToggle().getUserData().toString();
+            System.out.println("Color Choice for Player B is " + paintChoiceB);
+            players[1].paint = Color.YELLOW;
+            if (paintChoiceB.equals("Violet")) players[1].paint = Color.VIOLET;
+            else if (paintChoiceB.equals("Orange")) players[1].paint = Color.ORANGE;
+            else if (paintChoiceB.equals("Coral")) players[1].paint = Color.CORAL;
             dialog.close();
         } else if (result.get() == cancelButton) {
             dialog.close();
         }
+        printStatistics();
+        startPlay();
     }
 
     // initialize players
     private void initPlayers() throws IOException {
         String inLine, name;
         int games = 0, wins = 0, losses = 0, ties = 0;
+        winner = -1;
         ArrayList<String> splitList = new ArrayList<>();
         File fileIn = new File(fileMain);
         File fileOut = new File(fileBack);
@@ -376,7 +434,15 @@ public class ConnectFour extends Application {
             output.close();
             input.close();
         }
-        playerStats.setText(players[0].name + "'s Turn");
+        startPlay();
+    }
+
+    private void startPlay() {
+        winner = -1;
+        int who = (firstTurn == 'R'? 0 : 1);
+        playerEllipse.setFill(players[who].paint);
+        playerStats.setText(players[who].name + "'s Turn");
+        printStatistics();
     }
 
     // Check if board is full
@@ -393,7 +459,8 @@ public class ConnectFour extends Application {
     public boolean isWon(char token) {
         Background background;
         if (token == ' ') return false;             // No winners if checking empty item.
-        if (token == 'R') background = new Background(new BackgroundFill(Color.ORCHID, null, null));
+        else if (winner >= 0) return true;
+        else if (token == 'R') background = new Background(new BackgroundFill(Color.ORCHID, null, null));
         else background = new Background(new BackgroundFill(Color.LIGHTCORAL, null, null));
         // Now Start the tests.
         // Check for four in a row horizontally.
@@ -407,6 +474,8 @@ public class ConnectFour extends Application {
                     cell[i][j + 1].setBackground(background);           // if a player has won in the horizontally, the background color of the cells that won the game will be turned to blue
                     cell[i][j + 2].setBackground(background);
                     cell[i][j + 3].setBackground(background);
+                    if (token == 'R') winner = 0;
+                    else if (token == 'B') winner = 1;
                     return true;
                 }
             }
@@ -416,7 +485,7 @@ public class ConnectFour extends Application {
             for (int i = 0; i < 3; i++) {
                 /* Sometimes printing out values is faster than using the debugger.
                 if (j == 3) {
-                    System.out.println(i + " " + j + " " + "Full Collumn: " +
+                    System.out.println(i + " " + j + " " + "Full Column: " +
                             cell[0][3].getToken() + cell[1][j].getToken()
                             + cell[2][j].getToken() + cell[3][j].getToken()
                             + cell[4][j].getToken() + cell[5][j].getToken()
@@ -431,6 +500,8 @@ public class ConnectFour extends Application {
                     cell[i + 1][j].setBackground(background);          // if a player has won in the vertically, the background color
                     cell[i + 2][j].setBackground(background);          //  of the cells that won the game will be turned to green
                     cell[i + 3][j].setBackground(background);
+                    if (token == 'R') winner = 0;
+                    else if (token == 'B') winner = 1;
                     return true;
                 }
             }
@@ -446,6 +517,8 @@ public class ConnectFour extends Application {
                     cell[i + 1][j + 1].setBackground(background);         // if a player has won in the horizontally, the background color of the cells that won the game will be turned to blue
                     cell[i + 2][j + 2].setBackground(background);
                     cell[i + 3][j + 3].setBackground(background);
+                    if (token == 'R') winner = 0;
+                    else if (token == 'B') winner = 1;
                     return true;
                 }
             }
@@ -466,6 +539,8 @@ public class ConnectFour extends Application {
                     cell[i - 1][j + 1].setBackground(background);           // if a player has won in the horizontally, the background color of the cells that won the game will be turned to blue
                     cell[i - 2][j + 2].setBackground(background);
                     cell[i - 3][j + 3].setBackground(background);
+                    if (token == 'R') winner = 0;
+                    else if (token == 'B') winner = 1;
                     return true;
                 }
             }
@@ -483,7 +558,8 @@ public class ConnectFour extends Application {
                 cell[i][j].setBackground(background);
             }
         }
-        whoseTurn = 'R';
+        whoseTurn = (whoseTurn == 'R' ? 'B' : 'R');
+        winner = -1;
     }
 
     // Define Cells for the board
@@ -530,9 +606,9 @@ public class ConnectFour extends Application {
             if (token == ' ') {
                 paint = Color.TRANSPARENT;
             } else if (token == 'R') {                                                             // creating an "X"
-                paint = Color.RED;
+                paint = players[0].paint;
             } else if (token == 'B') {
-                paint = Color.YELLOW;
+                paint = players[1].paint;
             }
             ellipse.setFill(paint);
             if (callBack) cell[xVal - 1][yVal].setToken(' ', false);
@@ -550,26 +626,23 @@ public class ConnectFour extends Application {
         private void handleMouseClick() {                                                                                   // creating the method to handle what happens when the mouse gets clicked
             if (token == ' ' && whoseTurn != ' ') {                                                                         // if the cell is empty and game is not over,
                 setToken(whoseTurn, false);                                                                                        // set the desired token into the cell that was clicked
-                if (isWon(whoseTurn)) {                                                                                     // checking the game status using the "isWon" method
-                    playerStats.setText((whoseTurn == 'R' ? players[0].name : players[1].name) +
+                if (isWon(whoseTurn)) {   // checking the game status using the "isWon" method
+                    int opponent = (winner == 0 ? 1 : 0);
+                    playerEllipse.setFill(players[winner].paint);
+                    playerStats.setText(players[winner].name +
                             " won the game! Congratulations");                  // if game is won, displays message saying "Congratulations"
-                    players[0].games++;
-                    players[1].games++;
-                    if (whoseTurn == 'R') {
-                        players[0].wins++;
-                        players[1].losses++;
-                    } else {
-                        players[1].wins++;
-                        players[0].losses++;
-                    }
-                    whoseTurn = ' ';                                                                                        // sets the "whichTurn" variable to empty making the game stop
+                    players[winner].games++;
+                    players[opponent].games++;
+                    players[winner].wins++;
+                    players[opponent].losses++;
+                    //whoseTurn = ' ';                                                                                        // sets the "whichTurn" variable to empty making the game stop
                 } else if (isFull()) {                                                                                        // checking the game status using the "isFull" method
                     playerStats.setText("Draw! The game is over");                                                               // if the game is full, then displays message saying "Draw"
                     players[0].games++;
                     players[1].games++;
                     players[0].ties++;
                     players[1].ties++;
-                    whoseTurn = ' ';                                                                                        // sets the "whichTurn" variable to empty making the game stop
+                    //whoseTurn = ' ';                                                                                        // sets the "whichTurn" variable to empty making the game stop
                     for (int i = 0; i < 3; i++) {
                         for (int j = 0; j < 3; j++) {
                             if (cell[i][j].getToken() != ' ') {                                                             // if all cells are not empty, then make the background of all cells turn to teal, thus clarifying that it is a draw
@@ -581,11 +654,11 @@ public class ConnectFour extends Application {
                 } else {
 
                     whoseTurn = (whoseTurn == 'R') ? 'B' : 'R';                                                             // changes the turn if the game is still going
-
-                    playerStats.setText((whoseTurn == 'R' ? players[0].name : players[1].name)
-                            + " Player's turn");                                                      // displays whose turn it is
+                    int who = (whoseTurn == 'R') ? 0 : 1;
+                    playerEllipse.setFill(players[who].paint);
+                    playerStats.setText(players[who].name + " Player's turn");                                                      // displays whose turn it is
                 }
-                //printStatistics();
+                printStatistics();
             }
         }
 
